@@ -72,7 +72,7 @@ public class Consumer implements Runnable {
           long tts = json.getLong("tts");
           long ts = timestamp.getEpochSecond();
           long exp = expArrival.getEpochSecond();
-          inputHandler.send(ts, new Object[] {line, stationId, stationName, trainNumber, exp, tts});
+          inputHandler.send(ts*1000, new Object[] {line, stationId, stationName, trainNumber, exp, tts});
         }
       }
     } catch (WakeupException we) {

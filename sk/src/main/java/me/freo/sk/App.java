@@ -14,15 +14,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.Random;
 
 import org.json.JSONObject;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
+
+import org.wso2.siddhi.core.SiddhiAppRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.query.output.callback.QueryCallback;
+
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.stream.output.StreamCallback;
-import org.wso2.siddhi.core.util.EventPrinter;
-import org.wso2.siddhi.query.api.ExecutionPlan;
-import org.wso2.siddhi.query.api.definition.StreamDefinition;
 
 /**
  * Hello world!
@@ -56,8 +54,8 @@ public class App {
 		ExecutorService executor = Executors.newFixedThreadPool(numConsumers);
 		SiddhiManager siddhiManager = new SiddhiManager();
 		
-		ExecutionPlanRuntime executionPlanRuntime = siddhiManager
-				.createExecutionPlanRuntime(plan);
+		
+		SiddhiAppRuntime executionPlanRuntime = siddhiManager.createSiddhiAppRuntime(plan);
 		
 		executionPlanRuntime.addCallback("outstream", new StreamCallback() {
 			String[] sd = executionPlanRuntime.getStreamDefinitionMap().get("outstream").getAttributeNameArray();

@@ -1,14 +1,51 @@
+/* this input stream is defined in the Java code so don't mess with it */
+
 @config(async = 'true') 
 define stream tflstream (line string, stationid string, stationname string, trainnumber int, expected long, tts long);
 
-@info(name = 'query1') from tflstream#window.time(30)
-select trainnumber, stationname, stationid, line, expected, tts group by trainnumber having tts <= 60 insert into outstream;
 
+@info(name = 'query1') 
+
+from tflstream#window.time(1 sec) 
+select * 
+insert into outstream;
+
+/* PHASE 1 - Comment out the previous query and uncomment the next query */
 /*
- @info(name = 'query2') from trains#window.time(30)
-select line, stationname, trainnumber, stationid, tts, Min(tts) as mintts group by trainnumber having mintts==tts insert into bytrain;
-
-
- @info(name = 'query') from bytrain#window.time(30)
-select line, stationname, trainnumber, stationid, tts  insert into outstream;
+@info(name = 'query1') 
+from tflstream#window.time(1 min)
+select trainnumber, stationname, stationid, line, expected, tts 
+	having tts <= 10 insert into outstream;
 */
+
+
+/* PHASE 2 - comment previous and uncomment following */
+/*
+@info(name = 'query1') 
+from tflstream#window.time(20 sec)
+select trainnumber, stationname, stationid, line, expected, tts, min(expected) as minexp
+	group by trainnumber
+	having expected == minexp
+	output last every 20 sec
+	insert into outstream;
+
+*/
+
+/* PHASE 3  - comment previous and uncomment following */
+/*
+@info(name = 'query1') 
+from tflstream#window.time(20 sec)
+select trainnumber, stationname, stationid, line, expected, tts, min(expected) as minexp
+	group by trainnumber
+	having expected == minexp
+	output last every 20 sec
+	insert into nextstation;
+
+
+@info(name = 'query2') 
+from every e1=nextstation, e2=nextstation[e1.expected + 30 <= expected and e1.stationid == e2.stationid] 
+	select ( e2.expected - e1.expected) as delay, e2.trainnumber as trainnumber, e2.line as line, e2.tts as tts
+	insert into outstream;
+
+*/
+
