@@ -1,0 +1,14 @@
+@config(async = 'true') 
+define stream tflstream (line string, stationid string, stationname string, trainnumber int, expected long, tts long);
+
+@info(name = 'query1') from tflstream#window.time(30)
+select trainnumber, stationname, stationid, line, expected, tts group by trainnumber having tts <= 60 insert into outstream;
+
+/*
+ @info(name = 'query2') from trains#window.time(30)
+select line, stationname, trainnumber, stationid, tts, Min(tts) as mintts group by trainnumber having mintts==tts insert into bytrain;
+
+
+ @info(name = 'query') from bytrain#window.time(30)
+select line, stationname, trainnumber, stationid, tts  insert into outstream;
+*/
