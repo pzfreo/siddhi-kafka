@@ -13,7 +13,7 @@ insert into outstream;
 /* PHASE 1 - Comment out the previous query and uncomment the next query */
 /*
 @info(name = 'query1') 
-from tflstream#window.time(1 min)
+from tflstream#window.time(20 sec)
 select trainnumber, stationname, stationid, line, expected, tts 
 	having tts <= 10 insert into outstream;
 */
@@ -23,29 +23,37 @@ select trainnumber, stationname, stationid, line, expected, tts
 /*
 @info(name = 'query1') 
 from tflstream#window.time(20 sec)
-select trainnumber, stationname, stationid, line, expected, tts, min(expected) as minexp
-	group by trainnumber
+select str:concat(line, ":", trainnumber) as train, line, trainnumber, stationname, stationid, expected, tts, min(expected) as minexp
+	group by trainnumber, line
 	having expected == minexp
 	output last every 20 sec
 	insert into outstream;
 
 */
-
 /* PHASE 3  - comment previous and uncomment following */
+
 /*
 @info(name = 'query1') 
 from tflstream#window.time(20 sec)
-select trainnumber, stationname, stationid, line, expected, tts, min(expected) as minexp
-	group by trainnumber
+select str:concat(line, ":", trainnumber) as train, line, trainnumber, stationname, stationid, expected, tts, min(expected) as minexp
+	group by trainnumber, line
 	having expected == minexp
 	output last every 20 sec
 	insert into nextstation;
 
 
-@info(name = 'query2') 
-from every e1=nextstation, e2=nextstation[e1.expected + 30 <= expected and e1.stationid == e2.stationid] 
-	select ( e2.expected - e1.expected) as delay, e2.trainnumber as trainnumber, e2.line as line, e2.tts as tts
-	insert into outstream;
+partition with (train of nextstation) 
+begin
+	@info(name = 'query2') 
 
+	from every e1=nextstation, e2=nextstation[e1.expected + 30 <= expected] 
+							
+	select ( e2.expected - e1.expected) as delay,
+	 		e2.train as train, 
+			e2.tts as tts,
+			e2.stationname as stationname
+
+	insert into outstream
+	
+end;
 */
-

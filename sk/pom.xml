@@ -27,17 +27,22 @@
 		<dependency>
 			<groupId>org.wso2.siddhi</groupId>
 			<artifactId>siddhi-core</artifactId>
-			<version>4.0.0-M9</version>
+			<version>3.1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.wso2.siddhi</groupId>
 			<artifactId>siddhi-query-api</artifactId>
-			<version>4.0.0-M9</version>
+			<version>3.1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.wso2.siddhi</groupId>
 			<artifactId>siddhi-query-compiler</artifactId>
-			<version>4.0.0-M9</version>
+			<version>3.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.wso2.siddhi</groupId>
+			<artifactId>siddhi-extension-string</artifactId>
+			<version>3.1.2</version>
 		</dependency>
 
 		<dependency>
