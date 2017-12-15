@@ -53,7 +53,7 @@ begin
 			e2.tts as tts,
 			e2.stationname as stationname
 
-	insert into outstream
+	insert into outstream;
 	
 end;
 */
