@@ -32,7 +32,7 @@
 		<dependency>
 			<groupId>org.wso2.siddhi</groupId>
 			<artifactId>siddhi-query-api</artifactId>
-			<version>3.1.2</version>
+			<version>4.5.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.wso2.siddhi</groupId>
