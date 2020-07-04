@@ -3,12 +3,12 @@
 @config(async = 'true') 
 define stream tflstream (line string, stationid string, stationname string, trainnumber int, expected long, tts long);
 
-/*
+
 @info(name = 'simplelogquery') 
 from tflstream#window.time(1 sec) 
 select * 
 insert into outstream;
-(
+
 /* PHASE 1 - Comment out the previous query and uncomment the next query */
 
 /*
@@ -60,8 +60,8 @@ begin
 end;
 */
 
-/* PHASE 4 - comment previous and uncomment following */
-
+/* PHASE 4 - Aggregation - comment previous and uncomment following */
+/*
 define stream outstream(delay long, line string, train string, tts long, stationname string );
 
 define aggregation LateAggregation
@@ -94,3 +94,4 @@ begin
 	
 end;
 
+*/
