@@ -95,37 +95,44 @@ public class App {
 			@Override
 			public void run() {
 				// print out query if available
-				System.err.println();
-				System.err.println("===================");
-				System.err.println("aggregate query");
-				Attribute[] atts = runtime.getStoreQueryOutputAttributes("from LateAggregation within \"2020-**-** **:**:** +00:00\" per \"minutes\" select *;");
+				java.util.Date d=new java.util.Date();  
+				String year=String.valueOf(d.getYear()+1900);
+				System.err.println("year "+year);
+				String query = "from LateAggregation within \""+year+"-**-** **:**:** +00:00\" per \"minutes\" select *;";
 				
-
-				Event[] events = runtime.query("from LateAggregation within \"2020-**-** **:**:** +00:00\" per \"minutes\" select *;");
-				
-				if (events != null) {
+				try {
 					
-					JSONObject json = new JSONObject();
-					for (int i=0; i < events.length; i++) {
-						Object[] data = events[i].getData();
-						for (int j=0; j< data.length; j++) {
-							if (atts[j].getName()=="AGG_TIMESTAMP") {
-								Long ts = Long.parseLong(String.valueOf(data[j]));
-								java.util.Date date = new java.util.Date(ts); 
-								SimpleDateFormat fdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z"); 
-								String formattedDate = fdf.format(date);
-								json.put(atts[j].getName(), formattedDate);
-							} else {
-								json.put(atts[j].getName(), data[j]);
-							}
-						}
-						System.out.println(json.toString(4));
-					}
-				}	
-				else {
-					System.err.println("no result from aggregate query");
+					 Attribute[] atts = runtime.getStoreQueryOutputAttributes(query);
+					 System.err.println();
+					 System.err.println("===================");
+					 System.err.println("aggregate query");
+					 
+					 Event[] events = runtime.query(query);
+					 
+					 if (events != null) {
+						 
+						 JSONObject json = new JSONObject();
+						 for (int i=0; i < events.length; i++) {
+							 Object[] data = events[i].getData();
+							 for (int j=0; j< data.length; j++) {
+								 if (atts[j].getName()=="AGG_TIMESTAMP") {
+									 Long ts = Long.parseLong(String.valueOf(data[j]));
+									 java.util.Date date = new java.util.Date(ts); 
+									 SimpleDateFormat fdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z"); 
+									 String formattedDate = fdf.format(date);
+									 json.put(atts[j].getName(), formattedDate);
+								 } else {
+									 json.put(atts[j].getName(), data[j]);
+								 }
+							 }
+							 System.out.println(json.toString(4));
+						 }
+					 }	
+	 
 				}
+				catch (Exception e) { e.printStackTrace();} // ignore if query fails
 
+				
 				for (Consumer consumer : consumers) {
 					consumer.shutdown();
 				}
