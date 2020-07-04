@@ -12,14 +12,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.Random;
+import java.text.SimpleDateFormat;
 
 import org.json.JSONObject;
-import org.wso2.siddhi.core.ExecutionPlanRuntime;
+// import io.siddhi.core.runtime;
 
-import org.wso2.siddhi.core.SiddhiManager;
-import org.wso2.siddhi.core.event.Event;
-import org.wso2.siddhi.core.stream.input.InputHandler;
-import org.wso2.siddhi.core.stream.output.StreamCallback;
+import io.siddhi.core.SiddhiManager;
+import io.siddhi.core.SiddhiAppRuntime;
+import io.siddhi.core.event.Event;
+import io.siddhi.query.api.definition.Attribute;
+import io.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.stream.output.StreamCallback;
 
 /**
  * Hello world!
@@ -41,7 +44,8 @@ public class App {
 		BufferedReader br = new BufferedReader(new FileReader(inFile));
 		String cl;
 		while ((cl = br.readLine()) != null) {
-            plan += cl;
+			plan += cl ;
+			plan += "\n";
         }
 		br.close();
 		
@@ -53,11 +57,11 @@ public class App {
 		ExecutorService executor = Executors.newFixedThreadPool(numConsumers);
 		SiddhiManager siddhiManager = new SiddhiManager();
 		
-	
-		ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(plan);
+		SiddhiAppRuntime runtime = siddhiManager.createSiddhiAppRuntime(plan);
 		
-		executionPlanRuntime.addCallback("outstream", new StreamCallback() {
-			String[] sd = executionPlanRuntime.getStreamDefinitionMap().get("outstream").getAttributeNameArray();
+		
+		runtime.addCallback("outstream", new StreamCallback() {
+			String[] sd = runtime.getStreamDefinitionMap().get("outstream").getAttributeNameArray();
 			
 			@Override
 			public void receive(Event[] events) {
@@ -71,14 +75,14 @@ public class App {
 						json.put(sd[j], data[j]);
 					}
 					json.put("timestamp", events[i].getTimestamp());
-					System.out.println(json.toString());
+					System.out.println(json.toString(4));
 				}
 				
 				
 			}
 		});
-		executionPlanRuntime.start();
-		InputHandler ih = executionPlanRuntime.getInputHandler("tflstream");
+		runtime.start();
+		InputHandler ih = runtime.getInputHandler("tflstream");
 
 		final List<Consumer> consumers = new ArrayList<>();
 		for (int i = 0; i < numConsumers; i++) {
@@ -90,6 +94,38 @@ public class App {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
+				// print out query if available
+				System.err.println();
+				System.err.println("===================");
+				System.err.println("aggregate query");
+				Attribute[] atts = runtime.getStoreQueryOutputAttributes("from LateAggregation within \"2020-**-** **:**:** +00:00\" per \"minutes\" select *;");
+				
+
+				Event[] events = runtime.query("from LateAggregation within \"2020-**-** **:**:** +00:00\" per \"minutes\" select *;");
+				
+				if (events != null) {
+					
+					JSONObject json = new JSONObject();
+					for (int i=0; i < events.length; i++) {
+						Object[] data = events[i].getData();
+						for (int j=0; j< data.length; j++) {
+							if (atts[j].getName()=="AGG_TIMESTAMP") {
+								Long ts = Long.parseLong(String.valueOf(data[j]));
+								java.util.Date date = new java.util.Date(ts); 
+								SimpleDateFormat fdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z"); 
+								String formattedDate = fdf.format(date);
+								json.put(atts[j].getName(), formattedDate);
+							} else {
+								json.put(atts[j].getName(), data[j]);
+							}
+						}
+						System.out.println(json.toString(4));
+					}
+				}	
+				else {
+					System.err.println("no result from aggregate query");
+				}
+
 				for (Consumer consumer : consumers) {
 					consumer.shutdown();
 				}
@@ -101,5 +137,6 @@ public class App {
 				}
 			}
 		});
+		
 	}
 }

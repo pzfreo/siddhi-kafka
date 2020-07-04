@@ -27,7 +27,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.log4j.helpers.ISO8601DateFormat;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.wso2.siddhi.core.stream.input.InputHandler;
+import io.siddhi.core.stream.input.InputHandler;
 
 public class Consumer implements Runnable {
   private final KafkaConsumer<String, String> consumer;
