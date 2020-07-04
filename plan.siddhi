@@ -54,7 +54,7 @@ begin
 	 		e2.train as train, 
 			e2.tts as tts,
 			e2.stationname as stationname
-	having e1.stationid == e2.stationid
+	
 	insert into outstream;
 	
 end;
