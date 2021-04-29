@@ -1,0 +1,34 @@
+version: 2
+updates:
+- package-ecosystem: maven
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: io.siddhi:siddhi-query-api
+    versions:
+    - 5.1.16
+    - 5.1.17
+    - 5.1.18
+  - dependency-name: io.siddhi:siddhi-core
+    versions:
+    - 5.1.16
+    - 5.1.17
+    - 5.1.18
+  - dependency-name: io.siddhi:siddhi-annotations
+    versions:
+    - 5.1.16
+    - 5.1.17
+    - 5.1.18
+  - dependency-name: io.siddhi:siddhi-query-compiler
+    versions:
+    - 5.1.16
+    - 5.1.17
+    - 5.1.18
+  - dependency-name: org.apache.kafka:kafka-clients
+    versions:
+    - 2.7.0
+  - dependency-name: org.json:json
+    versions:
+    - "20201115"
